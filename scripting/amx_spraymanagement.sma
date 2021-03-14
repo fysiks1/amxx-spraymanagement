@@ -1,5 +1,6 @@
 #include <amxmodx>
 #include <amxmisc>
+#include <engine>
 
 #define MAX_SPRAYID 10
 new const MAX_DISTANCE = 50
@@ -13,14 +14,18 @@ enum _:SprayData {
 new g_Sprays[MAX_SPRAYID][SprayData]
 new g_iSprayCounter
 
+new g_bBlockedSpray[33]
+
 public plugin_init()
 {
-	register_plugin("Spray Management", "Fysiks", "1.0")
+	register_plugin("Spray Management", "Fysiks", "2.0")
 
 	register_clcmd("sprayid", "cmdQuerySpray", ADMIN_KICK)
 	register_clcmd("makespray", "cmdMakeSpray", ADMIN_KICK, "<name or #userid> - Sprays another player's spray")
-
+	register_concmd("amx_blockspray", "cmdBlockSpray", ADMIN_KICK, "<name or #userid> - Block a player from using their spray")
+	
 	register_event("23", "evSpray", "a", "1=112")	// SVC_TEMPENTITY (TE_PLAYERDECAL)
+	register_impulse(201, "impulseSpray")
 }
 
 public client_disconnect(id)
@@ -115,6 +120,23 @@ public cmdMakeSpray(id, level, cid)
 	return PLUGIN_HANDLED
 }
 
+public cmdBlockSpray(id, level, cid)
+{
+	if( !cmd_access(id, level, cid, 1) )
+		return PLUGIN_HANDLED
+
+	new szTarget[32], iTarget
+
+	read_argv(1, szTarget, 31)
+	iTarget = cmd_target(id, szTarget)
+	if( iTarget )
+	{
+		g_bBlockedSpray[iTarget] = true
+	}
+
+	return PLUGIN_HANDLED
+}
+
 public evSpray()
 {
 	static id, iCoords[3]
@@ -125,6 +147,16 @@ public evSpray()
 	iCoords[2] = read_data(5)	// Spray coord z
 
 	pushSpray(iCoords, id, id)
+}
+
+public impulseSpray(id)
+{
+	if( g_bBlockedSpray[id] )
+	{
+		return PLUGIN_HANDLED_MAIN
+	}
+
+	return PLUGIN_CONTINUE
 }
 
 pushSpray(iOrigin[3], iOwner, iSprayer)
