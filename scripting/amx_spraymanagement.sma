@@ -8,7 +8,8 @@ new const MAX_DISTANCE = 50
 enum _:SprayData {
 	SprayOrigin[3],
 	SprayOwner,
-	SpraySprayer
+	SpraySprayer,
+	SprayTime
 }
 
 new g_Sprays[MAX_SPRAYID][SprayData]
@@ -18,7 +19,7 @@ new g_bBlockedSpray[33]
 
 public plugin_init()
 {
-	register_plugin("Spray Management", "Fysiks", "2.1")
+	register_plugin("Spray Management", "Fysiks", "2.2")
 
 	register_clcmd("sprayid", "cmdQuerySpray", ADMIN_KICK)
 	register_clcmd("makespray", "cmdMakeSpray", ADMIN_KICK, "<name or #userid> - Sprays another player's spray")
@@ -27,6 +28,8 @@ public plugin_init()
 	
 	register_event("23", "evSpray", "a", "1=112")	// SVC_TEMPENTITY (TE_PLAYERDECAL)
 	register_impulse(201, "impulseSpray")
+
+	set_task(30.0, "sprayCleanup", .flags="b") // Periodically clear old sprays
 }
 
 public client_disconnect(id)
@@ -133,6 +136,9 @@ public cmdBlockSpray(id, level, cid)
 	if( iTarget )
 	{
 		g_bBlockedSpray[iTarget] = true
+
+		new szName[32]; get_user_name(iTarget, szName, charsmax(szName))
+		console_print(id, "Sprays have been blocked for %s", szName)
 	}
 
 	return PLUGIN_HANDLED
@@ -150,6 +156,9 @@ public cmdUnblockSpray(id, level, cid)
 	if( iTarget )
 	{
 		g_bBlockedSpray[iTarget] = false
+
+		new szName[32]; get_user_name(iTarget, szName, charsmax(szName))
+		console_print(id, "Sprays have been unblocked for %s", szName)
 	}
 
 	return PLUGIN_HANDLED
@@ -184,5 +193,21 @@ pushSpray(iOrigin[3], iOwner, iSprayer)
 	g_Sprays[g_iSprayCounter][SprayOrigin][2] = iOrigin[2]
 	g_Sprays[g_iSprayCounter][SprayOwner] = iOwner
 	g_Sprays[g_iSprayCounter][SpraySprayer] = iSprayer
+	g_Sprays[g_iSprayCounter][SprayTime] = get_systime()
 	g_iSprayCounter = ++g_iSprayCounter % sizeof(g_Sprays)
+}
+
+/* Clear old sprays since they disappear after some time */
+public sprayCleanup()
+{
+	static iTimestamp
+	iTimestamp = get_systime()
+	
+	for( new i = 0; i < sizeof(g_Sprays); i++ )
+	{
+		if( (iTimestamp - g_Sprays[i][SprayTime]) > 120.0 )
+		{
+			g_Sprays[i][SprayOwner] = 0
+		}
+	}
 }
