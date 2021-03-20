@@ -18,11 +18,12 @@ new g_bBlockedSpray[33]
 
 public plugin_init()
 {
-	register_plugin("Spray Management", "Fysiks", "2.0")
+	register_plugin("Spray Management", "Fysiks", "2.1")
 
 	register_clcmd("sprayid", "cmdQuerySpray", ADMIN_KICK)
 	register_clcmd("makespray", "cmdMakeSpray", ADMIN_KICK, "<name or #userid> - Sprays another player's spray")
-	register_concmd("amx_blockspray", "cmdBlockSpray", ADMIN_KICK, "<name or #userid> - Block a player from using their spray")
+	register_concmd("amx_blockspray", "cmdBlockSpray", ADMIN_KICK, "<name or #userid> - Block a player's spray")
+	register_concmd("amx_unblockspray", "cmdUnblockSpray", ADMIN_KICK, "<name or #userid> - Unblock a player's spray")
 	
 	register_event("23", "evSpray", "a", "1=112")	// SVC_TEMPENTITY (TE_PLAYERDECAL)
 	register_impulse(201, "impulseSpray")
@@ -128,10 +129,27 @@ public cmdBlockSpray(id, level, cid)
 	new szTarget[32], iTarget
 
 	read_argv(1, szTarget, 31)
-	iTarget = cmd_target(id, szTarget)
+	iTarget = cmd_target(id, szTarget, CMDTARGET_ALLOW_SELF | CMDTARGET_OBEY_IMMUNITY)
 	if( iTarget )
 	{
 		g_bBlockedSpray[iTarget] = true
+	}
+
+	return PLUGIN_HANDLED
+}
+
+public cmdUnblockSpray(id, level, cid)
+{
+	if( !cmd_access(id, level, cid, 1) )
+		return PLUGIN_HANDLED
+
+	new szTarget[32], iTarget
+
+	read_argv(1, szTarget, 31)
+	iTarget = cmd_target(id, szTarget, CMDTARGET_ALLOW_SELF | CMDTARGET_OBEY_IMMUNITY)
+	if( iTarget )
+	{
+		g_bBlockedSpray[iTarget] = false
 	}
 
 	return PLUGIN_HANDLED
