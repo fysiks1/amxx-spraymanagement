@@ -133,6 +133,9 @@ public cmdBlockSpray(id, level, cid)
 	if( iTarget )
 	{
 		g_bBlockedSpray[iTarget] = true
+
+		new szName[32]; get_user_name(iTarget, szName, charsmax(szName))
+		console_print(id, "Sprays have been blocked for %s", szName)
 	}
 
 	return PLUGIN_HANDLED
@@ -150,6 +153,9 @@ public cmdUnblockSpray(id, level, cid)
 	if( iTarget )
 	{
 		g_bBlockedSpray[iTarget] = false
+
+		new szName[32]; get_user_name(iTarget, szName, charsmax(szName))
+		console_print(id, "Sprays have been unblocked for %s", szName)
 	}
 
 	return PLUGIN_HANDLED
