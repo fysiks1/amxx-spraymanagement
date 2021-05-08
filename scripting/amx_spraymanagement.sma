@@ -118,7 +118,9 @@ public cmdMakeSpray(id, level, cid)
 
 		pushSpray(iTargetOrigin, iPlayer, id)
 
-		client_print(id, print_console, "[AMX] Spray successful")
+		new szName[32]
+		get_user_name(iPlayer, szName, charsmax(szName))
+		client_print(id, print_console, "[AMX] Spray successful (%s)", szName)
 	}
 
 	return PLUGIN_HANDLED
