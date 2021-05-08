@@ -17,12 +17,15 @@ new g_iSprayCounter
 
 new g_bBlockedSpray[33]
 
+new g_iCycleIndex
+
 public plugin_init()
 {
 	register_plugin("Spray Management", "Fysiks", "2.2.1")
 
 	register_clcmd("sprayid", "cmdQuerySpray", ADMIN_KICK)
 	register_clcmd("makespray", "cmdMakeSpray", ADMIN_KICK, "<name or #userid> - Sprays another player's spray")
+	register_clcmd("cyclespray", "cmdCycleSpray", ADMIN_KICK)
 	register_concmd("amx_blockspray", "cmdBlockSpray", ADMIN_KICK, "<name or #userid> - Block a player's spray")
 	register_concmd("amx_unblockspray", "cmdBlockSpray", ADMIN_KICK, "<name or #userid> - Unblock a player's spray")
 	
@@ -130,6 +133,22 @@ stock spraySpray(iOwner, iSprayer)
 	new szName[32]
 	get_user_name(iOwner, szName, charsmax(szName))
 	client_print(iSprayer, print_console, "[AMX] Spray successful (%s)", szName)
+}
+
+public cmdCycleSpray(id, level, cid)
+{
+	if( !cmd_access(id, level, cid, 1) )
+		return PLUGIN_HANDLED
+
+	new iPlayers[32], iPlayersNum
+	get_players(iPlayers, iPlayersNum)
+	
+	new i = g_iCycleIndex % iPlayersNum
+	g_iCycleIndex = i++
+
+	spraySpray(iPlayers[i], id)
+
+	return PLUGIN_HANDLED
 }
 
 public cmdBlockSpray(id, level, cid)
