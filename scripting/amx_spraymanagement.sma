@@ -19,7 +19,7 @@ new g_bBlockedSpray[33]
 
 public plugin_init()
 {
-	register_plugin("Spray Management", "Fysiks", "2.2")
+	register_plugin("Spray Management", "Fysiks", "2.2.1")
 
 	register_clcmd("sprayid", "cmdQuerySpray", ADMIN_KICK)
 	register_clcmd("makespray", "cmdMakeSpray", ADMIN_KICK, "<name or #userid> - Sprays another player's spray")
@@ -102,7 +102,7 @@ public cmdMakeSpray(id, level, cid)
 
 	read_argv(1, szArg, 31)
 	new iPlayer = cmd_target(id, szArg)
-	if( !iPlayer )
+	if( iPlayer )
 	{
 		get_user_origin(id, iTargetOrigin, 3) // 3 = hitpoint for weapon
 
