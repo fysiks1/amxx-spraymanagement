@@ -98,32 +98,38 @@ public cmdMakeSpray(id, level, cid)
 		return PLUGIN_HANDLED
 
 	new szArg[32]
-	new iTargetOrigin[3]
 
 	read_argv(1, szArg, 31)
 	new iPlayer = cmd_target(id, szArg)
 	if( iPlayer )
 	{
-		get_user_origin(id, iTargetOrigin, 3) // 3 = hitpoint for weapon
-
-		message_begin(MSG_ALL, SVC_TEMPENTITY)
-		write_byte(112) // TE_PLAYERDECAL
-		write_byte(iPlayer)
-		write_coord(iTargetOrigin[0])
-		write_coord(iTargetOrigin[1])
-		write_coord(iTargetOrigin[2])
-		write_short(0) // ???
-		write_byte(1)
-		message_end()
-
-		pushSpray(iTargetOrigin, iPlayer, id)
-
-		new szName[32]
-		get_user_name(iPlayer, szName, charsmax(szName))
-		client_print(id, print_console, "[AMX] Spray successful (%s)", szName)
+		spraySpray(iPlayer, id)
 	}
 
 	return PLUGIN_HANDLED
+}
+
+stock spraySpray(iOwner, iSprayer)
+{
+	new iTargetOrigin[3]
+
+	get_user_origin(iSprayer, iTargetOrigin, 3) // 3 = hitpoint for weapon
+
+	message_begin(MSG_ALL, SVC_TEMPENTITY)
+	write_byte(112) // TE_PLAYERDECAL
+	write_byte(iOwner)
+	write_coord(iTargetOrigin[0])
+	write_coord(iTargetOrigin[1])
+	write_coord(iTargetOrigin[2])
+	write_short(0) // ???
+	write_byte(1)
+	message_end()
+
+	pushSpray(iTargetOrigin, iOwner, iSprayer)
+
+	new szName[32]
+	get_user_name(iOwner, szName, charsmax(szName))
+	client_print(iSprayer, print_console, "[AMX] Spray successful (%s)", szName)
 }
 
 public cmdBlockSpray(id, level, cid)
