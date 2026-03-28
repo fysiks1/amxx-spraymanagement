@@ -21,7 +21,7 @@ new g_iCycleIndex
 
 public plugin_init()
 {
-	register_plugin("Spray Management", "Fysiks", "2.2.3")
+	register_plugin("Spray Management", "Fysiks", "2.2.4")
 
 	register_clcmd("sprayid", "cmdQuerySpray", ADMIN_KICK)
 	register_clcmd("makespray", "cmdMakeSpray", ADMIN_KICK, "<name or #userid> - Sprays another player's spray")
@@ -103,7 +103,7 @@ public cmdMakeSpray(id, level, cid)
 	new szArg[32]
 
 	read_argv(1, szArg, 31)
-	new iPlayer = cmd_target(id, szArg)
+	new iPlayer = cmd_target(id, szArg, 0)
 	if( iPlayer )
 	{
 		spraySpray(iPlayer, id)
